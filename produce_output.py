@@ -15,11 +15,11 @@ def openai_output(input, request, history=None):
                 },
             ],
             temperature=1,
-            max_tokens=500,
+            max_tokens=600,
             top_p=1,
         )
         respond = response.choices[0].message.content
-        print(respond)
+        #print(respond)
         try:
             p_query = respond.split("```sql")[1].split("```")[0]
             query = p_query.strip().replace("\n", " ")
@@ -39,7 +39,7 @@ def openai_output(input, request, history=None):
             model="gpt-4o-mini",
             messages=history,
             temperature=1,
-            max_tokens=500,
+            max_tokens=1024,
             top_p=1,
         )
         respond = response.choices[0].message.content

@@ -1,17 +1,19 @@
 import produce_input as i
 import produce_output as o
 import sqlalchemy as engine
+import helper
 
 # import sys
 import click
 
 
 @click.command()
-def run():
+@click.option("--path", "-f", help="data description file path (optional).")
+def run(path):
     db = engine.create_engine(
         click.prompt("Please enter your database connection string")
     )
-    input_str = i.produce_input(db)
+    input_str = i.produce_input(db, description=path)
     request = click.prompt("Please enter your request")
     history_chat = [
         {"role": "system", "content": input_str},
@@ -25,12 +27,24 @@ def run():
         # query, p_query, respond = o.openai_output(input_str, request)
         history_chat.append({"role": "assistant", "content": respond[2]})
         click.echo(respond[1])
-        click.echo(i.execute(respond[0], db))
+        query = respond[0]
+        if helper.identify_process(query) == 1:
+            check = click.prompt(
+                "are you sure to run this query?(y/n)",
+                click.Choice(["y", "n"], case_sensitive=False),
+            )
+            if check == "y":
+                click.echo(i.modify(query, db))
+            else:
+                pass
+
+        else:
+            click.echo(i.execute(query, db))
     else:
         click.echo(
             "Did not find query in the response, please check your request and try again."
         )
-        click.echo(respond[0])
+        click.echo(respond)
 
     while True:
         following = click.prompt(
@@ -48,18 +62,29 @@ def run():
                 },
             ]
             respond = o.openai_output(input_str, request)
-            if len(respond) == 3:   
+            if len(respond) == 3:
                 # query, p_query, respond = o.openai_output(input_str, request)
-                history_chat.append(
-                    {"role": "assistant", "content": respond[2]}
-                )
+                history_chat.append({"role": "assistant", "content": respond[2]})
                 click.echo(respond[1])
-                click.echo(i.execute(respond[0], db))
-            else:   
+                query = respond[0]
+                if helper.identify_process(query) == 1:
+                    check = click.prompt(
+                        "are you sure to run this query?(y/n)",
+                        click.Choice(["y", "n"], case_sensitive=False),
+                    )
+                    if check == "y":
+                        click.echo(i.modify(query, db))
+                    else:
+                        continue
+                else:
+                    click.echo(i.execute(query, db))
+
+                
+            else:
                 click.echo(
                     "Did not find query in the response, please check your request and try again."
                 )
-                click.echo(respond[0])
+                click.echo(respond)
         elif following == "c":
             while True:
                 repost = click.prompt(
@@ -69,19 +94,32 @@ def run():
                 if repost == "d":
                     request = click.prompt("Please enter your request")
                     request = "here's more details on last query:" + request
-                    respond= o.openai_output (input_str, request, history=history_chat)
+                    respond = o.openai_output(input_str, request, history=history_chat)
                     if len(respond) == 3:
                         # query, p_query, respond = o.openai_output(input_str, request)
                         history_chat.append(
                             {"role": "assistant", "content": respond[2]}
                         )
                         click.echo(respond[1])
-                        click.echo(i.execute(respond[0], db))
+                        query = respond[0]
+                        if helper.identify_process(query) == 1:
+                            check = click.prompt(
+                                "are you sure to run this query?(y/n)",
+                                click.Choice(["y", "n"], case_sensitive=False),
+                            )
+                            if check == "y":
+                                click.echo(i.modify(query, db))
+                            else:
+                                continue
+
+                        else:
+                            click.echo(i.execute(query, db))
+                        
                     else:
                         click.echo(
                             "Did not find query in the response, please check your request and try again."
                         )
-                        click.echo(respond[0])
+                        click.echo(respond)
                     break
                 elif repost == "m":
                     query = click.prompt("Please enter your SQL query")
