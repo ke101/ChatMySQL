@@ -1,0 +1,6 @@
+openai == 1.65.4
+numpy == 1.24.3
+pandas == 1.5.3
+pymysql == 1.1.1
+click == 8.0.4
+sqlalchemy == 1.4.39
