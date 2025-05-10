@@ -1,4 +1,4 @@
-Prerequisite: "Python (>3.5)" and create a [virtual envirnoment](https://docs.python.org/3/library/venv.html) for running this program. 
+Prerequisite: **Python (>3.5)** and create a [virtual envirnoment](https://docs.python.org/3/library/venv.html) for running this program. 
 
 Activate the virtual envirnoment and install required packages.
 
@@ -8,7 +8,7 @@ To run ChatMySQL, download this repo and run following commands after cd to this
 
 `python src/run.py -f [data description file path]`
 
-and then just follow the prompt of the program to input "OpenAI API key" and "connection string".
+and then just follow the prompt of the program to input **OpenAI API key** and **connection string**.
 
 Here's one simple example: 
 
